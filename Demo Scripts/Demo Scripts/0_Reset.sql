@@ -2,39 +2,32 @@ USE AutoDealershipDemo
 GO
 
 /*******************************************************
-*** TURN ON SENTRYONE
-*** EXECUTE THIS WORKLOAD
+*** 1. RUN RESET 
+*** 2. TURN ON SENTRYONE
+*** 3. EXECUTE THIS WORKLOAD
 -- Execute in a new window
 EXEC AutoDealershipDemo.Workload.sp_RandomVINLookupBatch
 GO 1000
 *******************************************************/
 
+EXEC dbo.sp_DropAllNCIs @PrintOnly = 0, @RestoreBaseNCIs = 0;
 
-
-
-EXEC sp_configure N'show advanced options', 1
-RECONFIGURE
-GO
-
--- Reset indexes
-IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_InventoryFlat_DateReceived_VIN')
-	DROP INDEX InventoryFlat.IX_InventoryFlat_DateReceived_VIN
-GO
-IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_SalesHistory_InventoryID')
-	DROP INDEX SalesHistory.IX_SalesHistory_InventoryID
-GO
-IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_SalesHistory_InventoryID_Covering')
-	DROP INDEX SalesHistory.IX_SalesHistory_InventoryID_Covering
-GO
-IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_Inventory_VIN_Covering')
-	DROP INDEX Inventory.IX_Inventory_VIN_Covering
-GO
-IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_Customer_State')
-	DROP INDEX Customer.IX_Customer_State
-GO
-IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_Inventory_VIN')
-	ALTER INDEX [IX_Inventory_VIN] ON [dbo].[Inventory] DISABLE
-GO
+---- Reset indexes
+--IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_InventoryFlat_DateReceived_VIN')
+--	DROP INDEX InventoryFlat.IX_InventoryFlat_DateReceived_VIN
+--GO
+--IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_SalesHistory_InventoryID')
+--	DROP INDEX SalesHistory.IX_SalesHistory_InventoryID
+--GO
+--IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_SalesHistory_InventoryID_Covering')
+--	DROP INDEX SalesHistory.IX_SalesHistory_InventoryID_Covering
+--GO
+--IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_Inventory_VIN_Covering')
+--	DROP INDEX Inventory.IX_Inventory_VIN_Covering
+--GO
+--IF EXISTS(SELECT 1 FROM sys.indexes WHERE name = 'IX_Customer_State')
+--	DROP INDEX Customer.IX_Customer_State
+--GO
 
 -----
 -- Populate SalesSummary & SalesSummaryHeap
@@ -86,59 +79,12 @@ GO
 -----
 -- dbo.Customer
 -- Should be no non-clustered indexes on Customer
--- Quick Reset -> remove all NCL's from Customer
-DECLARE @SQLCmd NVARCHAR(4000);
-DECLARE rsExe CURSOR FAST_FORWARD FOR 
-	SELECT 'DROP INDEX Customer.' + name + ';' AS SQLCmd
-	FROM sys.indexes
-	WHERE indexes.object_id = OBJECT_ID(N'dbo.Customer')
-		AND indexes.type = 2	-- Nonclustered Indexes
-		AND indexes.is_primary_key = 0
-
-OPEN rsExe
-
-FETCH NEXT 
-	FROM rsExe INTO @SQLCmd 
-
-WHILE @@FETCH_STATUS = 0
-	BEGIN
-	-- Do Stuff
-	EXEC sp_executesql @SQLCmd 
-
-	FETCH NEXT 
- 		FROM rsExe INTO @SQLCmd 
-	END  
-CLOSE rsExe
-DEALLOCATE rsExe
-GO
 
 -----
 -- dbo.Inventory
--- Should only have: IX_Inventory_DateReceived & IX_Inventory_VIN (disabled)
-DECLARE @SQLCmd NVARCHAR(4000);
-DECLARE rsExe CURSOR FAST_FORWARD FOR 
-	SELECT 'DROP INDEX Inventory.' + name + ';' AS SQLCmd
-	FROM sys.indexes
-	WHERE indexes.object_id = OBJECT_ID(N'dbo.Inventory')
-		AND indexes.type = 2	-- Nonclustered Indexes
-		AND indexes.is_primary_key = 0
+-- Should only have: IX_Inventory_DateReceived & IX_Inventory_VIN
 
-OPEN rsExe
 
-FETCH NEXT 
-	FROM rsExe INTO @SQLCmd 
-
-WHILE @@FETCH_STATUS = 0
-	BEGIN
-	-- Do Stuff
-	EXEC sp_executesql @SQLCmd 
-
-	FETCH NEXT 
- 		FROM rsExe INTO @SQLCmd 
-	END  
-CLOSE rsExe
-DEALLOCATE rsExe
-GO
 /****** Object:  Index [IX_Inventory_DateReceived]    Script Date: 7/14/2019 5:22:50 PM ******/
 CREATE NONCLUSTERED INDEX [IX_Inventory_DateReceived] ON [dbo].[Inventory]
 (
@@ -160,39 +106,11 @@ CREATE NONCLUSTERED INDEX [IX_Inventory_VIN] ON [dbo].[Inventory]
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 75) ON [PRIMARY]
 GO
 
-ALTER INDEX [IX_Inventory_VIN] ON [dbo].[Inventory] DISABLE
-GO
-
 
 
 -----
 -- dbo.SalesHistory
 -- Should only have: IX_SalesHistory_TransactionDate 
--- DISABLED: IX_SalesHistory_CustomerID, IX_SalesHistory_InventoryID, IX_SalesHistory_SalesPersonID
-DECLARE @SQLCmd NVARCHAR(4000);
-DECLARE rsExe CURSOR FAST_FORWARD FOR 
-	SELECT 'DROP INDEX SalesHistory.' + name + ';' AS SQLCmd
-	FROM sys.indexes
-	WHERE indexes.object_id = OBJECT_ID(N'dbo.SalesHistory')
-		AND indexes.type = 2	-- Nonclustered Indexes
-		AND indexes.is_primary_key = 0
-
-OPEN rsExe
-
-FETCH NEXT 
-	FROM rsExe INTO @SQLCmd 
-
-WHILE @@FETCH_STATUS = 0
-	BEGIN
-	-- Do Stuff
-	EXEC sp_executesql @SQLCmd 
-
-	FETCH NEXT 
- 		FROM rsExe INTO @SQLCmd 
-	END  
-CLOSE rsExe
-DEALLOCATE rsExe
-GO
 
 USE [AutoDealershipDemo]
 GO
@@ -245,12 +163,38 @@ INCLUDE([CustomerID],[InventoryID],[SalesPersonID],[SellPrice]) WITH (PAD_INDEX 
 GO
 
 
-DROP INDEX Inventory.IX_Inventory_VIN
-GO
-CREATE NONCLUSTERED INDEX IX_Inventory_VIN ON dbo.Inventory (VIN)
-
-
 DROP INDEX SalesHistory.IX_SalesHistory_InventoryID
 GO
 CREATE NONCLUSTERED INDEX IX_SalesHistory_InventoryID ON dbo.SalesHistory (InventoryID) INCLUDE (SellPrice)
 GO
+
+-----
+-- SETUP for Scenario One
+-- IX_Inventory_VIN should be enabled!
+/* IX_SalesHistory_InventoryID may not exist OR may be DISABLED - verify */
+-- CREATE NONCLUSTERED INDEX IX_SalesHistory_InventoryID ON dbo.SalesHistory (InventoryID) INCLUDE (SellPrice)
+-- ALTER INDEX IX_SalesHistory_InventoryID ON dbo.SalesHistory REBUILD
+-- GO
+
+-- Need this for range scan example
+CREATE NONCLUSTERED INDEX IX_InventoryFlat_SoldPrice
+	ON dbo.InventoryFlat (
+		SoldPrice
+	);
+
+
+-- Used for Scenario-Five
+CREATE NONCLUSTERED INDEX IX_InventoryFlat_ModelName_Demo
+	ON dbo.InventoryFlat (
+		ModelName
+	)
+	INCLUDE (
+		VIN, InventoryFlatID
+	);
+
+
+EXEC sp_configure N'show advanced options', 1
+RECONFIGURE
+GO
+
+EXEC dbo.sp_DropAllNCIs @PrintOnly = 1;

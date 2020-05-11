@@ -10,8 +10,8 @@ GO
 
 -----
 -- SETUP
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Customer_State')
-	CREATE NONCLUSTERED INDEX IX_Customer_State ON Customer (
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Customer_State_Demo')
+	CREATE NONCLUSTERED INDEX IX_Customer_State_Demo ON Customer (
 		State
 	);
 GO
@@ -89,6 +89,11 @@ GO
 
 
 
+
+
+
+
+
 -----
 -- Finding Implicit Column Conversions in the Plan Cache
 -- Jonathan Kehayias
@@ -137,7 +142,7 @@ GO
 
 -----
 -- Clean up
-DROP INDEX Customer.IX_Customer_State
+DROP INDEX Customer.IX_Customer_State_Demo
 GO
 DROP INDEX SalesHistory.IX_SalesHistory_Covering
 GO

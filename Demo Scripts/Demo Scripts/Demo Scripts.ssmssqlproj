@@ -4,7 +4,7 @@
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
       <Items>
         <ConnectionNode Name="HAVOK.XMEN.COM:andy_local">
-          <Created>2019-07-13T15:07:19.0305743-05:00</Created>
+          <Created>2019-07-13T16:07:19.0305743-04:00</Created>
           <Type>SQL</Type>
           <Server>HAVOK.XMEN.COM</Server>
           <UserName>andy_local</UserName>
@@ -49,11 +49,23 @@
           <AssociatedConnUserName>andy_local</AssociatedConnUserName>
           <FullPath>4_Scenario-Three.sql</FullPath>
         </FileNode>
-        <FileNode Name="5_Secenario-Four.sql">
+        <FileNode Name="5_Scenario-Four.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:HAVOK.XMEN.COM:False:andy_local</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>HAVOK.XMEN.COM</AssociatedConnSrvName>
           <AssociatedConnUserName>andy_local</AssociatedConnUserName>
-          <FullPath>5_Secenario-Four.sql</FullPath>
+          <FullPath>5_Scenario-Four.sql</FullPath>
+        </FileNode>
+        <FileNode Name="6_Scenario-Five.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:HAVOK.XMEN.COM:False:andy_local</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>HAVOK.XMEN.COM</AssociatedConnSrvName>
+          <AssociatedConnUserName>andy_local</AssociatedConnUserName>
+          <FullPath>6_Scenario-Five.sql</FullPath>
+        </FileNode>
+        <FileNode Name="SQLQuery1.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:HAVOK.XMEN.COM:False:andy_local</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>HAVOK.XMEN.COM</AssociatedConnSrvName>
+          <AssociatedConnUserName>andy_local</AssociatedConnUserName>
+          <FullPath>SQLQuery1.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

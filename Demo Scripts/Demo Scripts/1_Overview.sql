@@ -105,6 +105,7 @@ GO
 
 -----
 -- Mixed JOIN example
+-- OPTIONAL
 DBCC DROPCLEANBUFFERS;
 GO
 
@@ -217,6 +218,7 @@ GO
 
 
 
+-----
 -- Ctrl-M: Turn off actual execution plan
 EXEC sp_help 'dbo.SalesSummary';
 
@@ -243,6 +245,8 @@ GO
 
 
 
+-----
+-- OPTIONAL
 -- Variation
 SELECT SoldPrice
 FROM dbo.InventoryFlat
@@ -280,8 +284,9 @@ GO
 
 -----
 -- Create an index to support this query!
--- DROP INDEX Customer.IX_Customer_State
-CREATE NONCLUSTERED INDEX IX_Customer_State ON dbo.Customer (State)
+-- DROP INDEX Customer.IX_Customer_State_Demo
+CREATE NONCLUSTERED INDEX IX_Customer_State_Demo
+	ON dbo.Customer (State)
 GO
 
 
@@ -373,6 +378,7 @@ GO
 
 
 ------
+-- OPTIONAL
 -- Multi-Seek Variation
 SELECT TOP 100000 *
 FROM dbo.SalesHistory
